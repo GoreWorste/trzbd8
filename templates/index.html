@@ -7,34 +7,46 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
 </head>
 <body>
-  <header>
-    <h1>Рекомендательная система покемонов</h1>
-    <p class="muted">Взвешенный перебор, варианты весов для сравнения подходов.</p>
+  <main class="page">
+  <header class="site-header">
+    <h1 class="site-title">Рекомендательная система покемонов</h1>
+    <p class="site-lead">Взвешенный перебор, варианты весов для сравнения подходов.</p>
   </header>
 
   {% if error %}
-  <div class="banner error">{{ error }}</div>
+  <div class="banner banner--error" role="alert">{{ error }}</div>
   {% endif %}
 
   <section class="card">
-    <h2>Рекомендация по запросу</h2>
-    <p class="muted">Типы (рус.): огонь, вода, трава, электричество, псих, дракон. Ключевые слова: сильный, быстрый, живучий, умный.</p>
-    <form method="post">
+    <h2 class="card__title">Рекомендация по запросу</h2>
+    <p class="card__note">Типы (рус.): огонь, вода, трава, электричество, псих, дракон. Ключевые слова: сильный, быстрый, живучий, умный.</p>
+    <form class="stack" method="post">
       <input type="hidden" name="action" value="recommend" />
-      <label>Запрос</label>
-      <input type="text" name="query" placeholder="например: огонь быстрый" required />
-      <label>Топ-N</label>
-      <input type="number" name="top_n" value="5" min="1" max="50" />
-      <label>Вариант весов</label>
-      <select name="variant">
-        <option value="default" {% if variant == 'default' %}selected{% endif %}>default</option>
-        <option value="strict" {% if variant == 'strict' %}selected{% endif %}>strict</option>
-        <option value="generous" {% if variant == 'generous' %}selected{% endif %}>generous</option>
-      </select>
-      <button type="submit">Подобрать</button>
+      <div class="field field--full">
+        <label for="query-input">Запрос</label>
+        <input id="query-input" type="text" name="query" placeholder="например: огонь быстрый" required autocomplete="off" />
+      </div>
+      <div class="form-row-inline">
+        <div class="field field--narrow">
+          <label for="top-n-input">Топ-N</label>
+          <input id="top-n-input" type="number" name="top_n" value="5" min="1" max="50" />
+        </div>
+        <div class="field field--medium">
+          <label for="variant-select">Вариант весов</label>
+          <select id="variant-select" name="variant">
+            <option value="default" {% if variant == 'default' %}selected{% endif %}>default</option>
+            <option value="strict" {% if variant == 'strict' %}selected{% endif %}>strict</option>
+            <option value="generous" {% if variant == 'generous' %}selected{% endif %}>generous</option>
+          </select>
+        </div>
+        <div class="field field--action">
+          <button class="btn btn--primary" type="submit">Подобрать</button>
+        </div>
+      </div>
     </form>
     {% if results is not none %}
-    <table>
+    <div class="table-scroll">
+    <table class="data-table">
       <thead>
         <tr>
           <th>Имя</th><th>Типы</th><th>Баллы</th><th>Макс.</th><th>%</th>
@@ -59,20 +71,29 @@
         {% endfor %}
       </tbody>
     </table>
+    </div>
     {% endif %}
   </section>
 
   <section class="card">
-    <h2>Поиск по имени</h2>
-    <form method="post">
+    <h2 class="card__title">Поиск по имени</h2>
+    <form class="stack" method="post">
       <input type="hidden" name="action" value="name" />
-      <input type="text" name="name_sub" placeholder="часть имени" required />
-      <select name="variant"><option value="{{ variant }}">{{ variant }}</option></select>
-      <button type="submit">Найти</button>
+      <input type="hidden" name="variant" value="{{ variant }}" />
+      <div class="form-row-inline">
+        <div class="field field--grow">
+          <label for="name-sub-input">Часть имени</label>
+          <input id="name-sub-input" type="text" name="name_sub" placeholder="например: Pikachu" required autocomplete="off" />
+        </div>
+        <div class="field field--action">
+          <button class="btn btn--primary" type="submit">Найти</button>
+        </div>
+      </div>
     </form>
     {% if name_hits is not none %}
-    <p>Найдено: {{ name_hits|length }}</p>
-    <table>
+    <p class="result-meta">Найдено: {{ name_hits|length }}</p>
+    <div class="table-scroll">
+    <table class="data-table">
       <thead><tr><th>Имя</th><th>Типы</th><th>Total</th></tr></thead>
       <tbody>
         {% for row in name_hits %}
@@ -84,19 +105,28 @@
         {% endfor %}
       </tbody>
     </table>
+    </div>
     {% endif %}
   </section>
 
   <section class="card">
-    <h2>Топ слабых (минимальный total)</h2>
-    <form method="post">
+    <h2 class="card__title">Топ слабых (минимальный total)</h2>
+    <form class="stack" method="post">
       <input type="hidden" name="action" value="weak" />
-      <input type="number" name="top_n" value="5" min="1" max="50" />
-      <select name="variant"><option value="{{ variant }}">{{ variant }}</option></select>
-      <button type="submit">Показать</button>
+      <input type="hidden" name="variant" value="{{ variant }}" />
+      <div class="form-row-inline">
+        <div class="field field--narrow">
+          <label for="weak-top-n">Топ-N</label>
+          <input id="weak-top-n" type="number" name="top_n" value="5" min="1" max="50" />
+        </div>
+        <div class="field field--action">
+          <button class="btn btn--primary" type="submit">Показать</button>
+        </div>
+      </div>
     </form>
     {% if weak is not none %}
-    <table>
+    <div class="table-scroll">
+    <table class="data-table">
       <thead>
         <tr>
           <th>Имя</th><th>Типы</th><th>Total</th>
@@ -119,30 +149,42 @@
         {% endfor %}
       </tbody>
     </table>
+    </div>
     {% endif %}
   </section>
 
   <section class="card">
-    <h2>Диапазон характеристики</h2>
-    <p class="muted">В реальных данных total обычно до ~800; пример из задания можно задать как угодно.</p>
-    <form method="post">
+    <h2 class="card__title">Диапазон характеристики</h2>
+    <p class="card__note">В реальных данных total обычно до ~800; пример из задания можно задать как угодно.</p>
+    <form class="stack" method="post">
       <input type="hidden" name="action" value="range" />
-      <label>Поле</label>
-      <select name="stat">
-        {% for s in ['attack','hp','defense','sp_attack','sp_defense','speed','total'] %}
-        <option value="{{ s }}">{{ s }}</option>
-        {% endfor %}
-      </select>
-      <label>От</label>
-      <input type="number" name="low" value="0" step="any" />
-      <label>До</label>
-      <input type="number" name="high" value="3000" step="any" />
-      <select name="variant"><option value="{{ variant }}">{{ variant }}</option></select>
-      <button type="submit">Фильтр</button>
+      <input type="hidden" name="variant" value="{{ variant }}" />
+      <div class="form-row-inline form-row-inline--wrap">
+        <div class="field field--medium">
+          <label for="stat-select">Поле</label>
+          <select id="stat-select" name="stat">
+            {% for s in ['attack','hp','defense','sp_attack','sp_defense','speed','total'] %}
+            <option value="{{ s }}">{{ s }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="field field--narrow">
+          <label for="low-input">От</label>
+          <input id="low-input" type="number" name="low" value="0" step="any" />
+        </div>
+        <div class="field field--narrow">
+          <label for="high-input">До</label>
+          <input id="high-input" type="number" name="high" value="3000" step="any" />
+        </div>
+        <div class="field field--action">
+          <button class="btn btn--primary" type="submit">Фильтр</button>
+        </div>
+      </div>
     </form>
     {% if range_hits is not none %}
-    <p>Строк (показ до 200): {{ range_hits|length }}</p>
-    <table>
+    <p class="result-meta">Строк (показ до 200): {{ range_hits|length }}</p>
+    <div class="table-scroll">
+    <table class="data-table">
       <thead><tr><th>Имя</th><th>Типы</th><th>Total</th><th>Atk</th></tr></thead>
       <tbody>
         {% for row in range_hits %}
@@ -155,29 +197,39 @@
         {% endfor %}
       </tbody>
     </table>
+    </div>
     {% endif %}
   </section>
 
   <section class="card">
-    <h2>Отзыв о покемоне</h2>
-    <form method="post">
+    <h2 class="card__title">Отзыв о покемоне</h2>
+    <form class="stack" method="post">
       <input type="hidden" name="action" value="review" />
-      <label>Имя покемона</label>
-      <input type="text" name="pokemon_name" required />
-      <label>Оценка 1–5</label>
-      <input type="number" name="rating" min="1" max="5" value="5" />
-      <label>Текст</label>
-      <textarea name="review_text" rows="3"></textarea>
-      <select name="variant"><option value="{{ variant }}">{{ variant }}</option></select>
-      <button type="submit">Сохранить</button>
+      <input type="hidden" name="variant" value="{{ variant }}" />
+      <div class="field field--full">
+        <label for="pokemon-name-input">Имя покемона</label>
+        <input id="pokemon-name-input" type="text" name="pokemon_name" required autocomplete="off" />
+      </div>
+      <div class="field field--narrow">
+        <label for="rating-input">Оценка 1–5</label>
+        <input id="rating-input" type="number" name="rating" min="1" max="5" value="5" />
+      </div>
+      <div class="field field--full">
+        <label for="review-text">Текст</label>
+        <textarea id="review-text" name="review_text" rows="4"></textarea>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn--primary" type="submit">Сохранить</button>
+      </div>
     </form>
   </section>
 
   <section class="card">
-    <h2>Статистика отзывов</h2>
-    <a class="btn secondary" href="{{ url_for('export_stats') }}">Скачать CSV</a>
+    <h2 class="card__title">Статистика отзывов</h2>
+    <p class="card__actions"><a class="btn btn--outline" href="{{ url_for('export_stats') }}">Скачать CSV</a></p>
     {% if stats %}
-    <table>
+    <div class="table-scroll">
+    <table class="data-table">
       <thead><tr><th>Покемон</th><th>Отзывов</th><th>Средняя оценка</th><th>Символов текста</th></tr></thead>
       <tbody>
         {% for r in stats %}
@@ -190,9 +242,11 @@
         {% endfor %}
       </tbody>
     </table>
+    </div>
     {% else %}
-    <p class="muted">Пока нет отзывов.</p>
+    <p class="card__note">Пока нет отзывов.</p>
     {% endif %}
   </section>
+  </main>
 </body>
 </html>
