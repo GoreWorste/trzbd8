@@ -1,0 +1,5 @@
+# Виртуальное окружение и кэш
+.venv/
+__pycache__/
+*.pyc
+.python-version

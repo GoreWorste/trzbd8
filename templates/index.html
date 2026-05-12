@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Рекомендации покемонов</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+  <header>
+    <h1>Рекомендательная система покемонов</h1>
+    <p class="muted">Взвешенный перебор, варианты весов для сравнения подходов.</p>
+  </header>
+
+  {% if error %}
+  <div class="banner error">{{ error }}</div>
+  {% endif %}
+
+  <section class="card">
+    <h2>Рекомендация по запросу</h2>
+    <p class="muted">Типы (рус.): огонь, вода, трава, электричество, псих, дракон. Ключевые слова: сильный, быстрый, живучий, умный.</p>
+    <form method="post">
+      <input type="hidden" name="action" value="recommend" />
+      <label>Запрос</label>
+      <input type="text" name="query" placeholder="например: огонь быстрый" required />
+      <label>Топ-N</label>
+      <input type="number" name="top_n" value="5" min="1" max="50" />
+      <label>Вариант весов</label>
+      <select name="variant">
+        <option value="default" {% if variant == 'default' %}selected{% endif %}>default</option>
+        <option value="strict" {% if variant == 'strict' %}selected{% endif %}>strict</option>
+        <option value="generous" {% if variant == 'generous' %}selected{% endif %}>generous</option>
+      </select>
+      <button type="submit">Подобрать</button>
+    </form>
+    {% if results is not none %}
+    <table>
+      <thead>
+        <tr>
+          <th>Имя</th><th>Типы</th><th>Баллы</th><th>Макс.</th><th>%</th>
+          <th>HP</th><th>Atk</th><th>Def</th><th>SpA</th><th>SpD</th><th>Spe</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in results %}
+        <tr>
+          <td>{{ row.name }}</td>
+          <td>{{ row.type1 }}{% if row.type2 %} / {{ row.type2 }}{% endif %}</td>
+          <td>{{ '%.1f'|format(row.score) }}</td>
+          <td>{{ '%.1f'|format(row.max_score) }}</td>
+          <td>{{ '%.1f'|format(row.compatibility_pct) }}</td>
+          <td>{{ row.hp|int }}</td>
+          <td>{{ row.attack|int }}</td>
+          <td>{{ row.defense|int }}</td>
+          <td>{{ row.sp_attack|int }}</td>
+          <td>{{ row.sp_defense|int }}</td>
+          <td>{{ row.speed|int }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% endif %}
+  </section>
+
+  <section class="card">
+    <h2>Поиск по имени</h2>
+    <form method="post">
+      <input type="hidden" name="action" value="name" />
+      <input type="text" name="name_sub" placeholder="часть имени" required />
+      <select name="variant"><option value="{{ variant }}">{{ variant }}</option></select>
+      <button type="submit">Найти</button>
+    </form>
+    {% if name_hits is not none %}
+    <p>Найдено: {{ name_hits|length }}</p>
+    <table>
+      <thead><tr><th>Имя</th><th>Типы</th><th>Total</th></tr></thead>
+      <tbody>
+        {% for row in name_hits %}
+        <tr>
+          <td>{{ row.name }}</td>
+          <td>{{ row.type1 }}{% if row.type2 %} / {{ row.type2 }}{% endif %}</td>
+          <td>{{ row.total|int }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% endif %}
+  </section>
+
+  <section class="card">
+    <h2>Топ слабых (минимальный total)</h2>
+    <form method="post">
+      <input type="hidden" name="action" value="weak" />
+      <input type="number" name="top_n" value="5" min="1" max="50" />
+      <select name="variant"><option value="{{ variant }}">{{ variant }}</option></select>
+      <button type="submit">Показать</button>
+    </form>
+    {% if weak is not none %}
+    <table>
+      <thead>
+        <tr>
+          <th>Имя</th><th>Типы</th><th>Total</th>
+          <th>HP</th><th>Atk</th><th>Def</th><th>SpA</th><th>SpD</th><th>Spe</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in weak %}
+        <tr>
+          <td>{{ row.name }}</td>
+          <td>{{ row.type1 }}{% if row.type2 %} / {{ row.type2 }}{% endif %}</td>
+          <td>{{ row.total|int }}</td>
+          <td>{{ row.hp|int }}</td>
+          <td>{{ row.attack|int }}</td>
+          <td>{{ row.defense|int }}</td>
+          <td>{{ row.sp_attack|int }}</td>
+          <td>{{ row.sp_defense|int }}</td>
+          <td>{{ row.speed|int }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% endif %}
+  </section>
+
+  <section class="card">
+    <h2>Диапазон характеристики</h2>
+    <p class="muted">В реальных данных total обычно до ~800; пример из задания можно задать как угодно.</p>
+    <form method="post">
+      <input type="hidden" name="action" value="range" />
+      <label>Поле</label>
+      <select name="stat">
+        {% for s in ['attack','hp','defense','sp_attack','sp_defense','speed','total'] %}
+        <option value="{{ s }}">{{ s }}</option>
+        {% endfor %}
+      </select>
+      <label>От</label>
+      <input type="number" name="low" value="0" step="any" />
+      <label>До</label>
+      <input type="number" name="high" value="3000" step="any" />
+      <select name="variant"><option value="{{ variant }}">{{ variant }}</option></select>
+      <button type="submit">Фильтр</button>
+    </form>
+    {% if range_hits is not none %}
+    <p>Строк (показ до 200): {{ range_hits|length }}</p>
+    <table>
+      <thead><tr><th>Имя</th><th>Типы</th><th>Total</th><th>Atk</th></tr></thead>
+      <tbody>
+        {% for row in range_hits %}
+        <tr>
+          <td>{{ row.name }}</td>
+          <td>{{ row.type1 }}{% if row.type2 %} / {{ row.type2 }}{% endif %}</td>
+          <td>{{ row.total|int }}</td>
+          <td>{{ row.attack|int }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% endif %}
+  </section>
+
+  <section class="card">
+    <h2>Отзыв о покемоне</h2>
+    <form method="post">
+      <input type="hidden" name="action" value="review" />
+      <label>Имя покемона</label>
+      <input type="text" name="pokemon_name" required />
+      <label>Оценка 1–5</label>
+      <input type="number" name="rating" min="1" max="5" value="5" />
+      <label>Текст</label>
+      <textarea name="review_text" rows="3"></textarea>
+      <select name="variant"><option value="{{ variant }}">{{ variant }}</option></select>
+      <button type="submit">Сохранить</button>
+    </form>
+  </section>
+
+  <section class="card">
+    <h2>Статистика отзывов</h2>
+    <a class="btn secondary" href="{{ url_for('export_stats') }}">Скачать CSV</a>
+    {% if stats %}
+    <table>
+      <thead><tr><th>Покемон</th><th>Отзывов</th><th>Средняя оценка</th><th>Символов текста</th></tr></thead>
+      <tbody>
+        {% for r in stats %}
+        <tr>
+          <td>{{ r.pokemon_name }}</td>
+          <td>{{ r.review_count }}</td>
+          <td>{{ r.avg_rating }}</td>
+          <td>{{ r.text_chars }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p class="muted">Пока нет отзывов.</p>
+    {% endif %}
+  </section>
+</body>
+</html>

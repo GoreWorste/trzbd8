@@ -1,0 +1,69 @@
+:root {
+  --bg: #0f1419;
+  --card: #1a2332;
+  --text: #e8eef7;
+  --muted: #9aa8bc;
+  --accent: #5b8cff;
+  --danger: #ff6b6b;
+  --radius: 10px;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: "Segoe UI", system-ui, sans-serif;
+  background: linear-gradient(160deg, #0b1020, #121a2b 40%, #0f1419);
+  color: var(--text);
+  line-height: 1.5;
+  padding: 2rem 1.25rem 4rem;
+}
+header { max-width: 960px; margin: 0 auto 1.5rem; }
+h1 { margin: 0 0 0.35rem; font-size: 1.75rem; }
+h2 { margin-top: 0; font-size: 1.15rem; }
+.muted { color: var(--muted); margin: 0.25rem 0 1rem; font-size: 0.95rem; }
+.card {
+  max-width: 960px;
+  margin: 0 auto 1.25rem;
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 1.25rem 1.5rem;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.35);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+form { display: grid; gap: 0.5rem; margin-bottom: 1rem; }
+@media (min-width: 640px) {
+  form { grid-template-columns: repeat(4, 1fr); align-items: end; }
+  form input[type="text"], form textarea { grid-column: span 2; }
+}
+label { font-size: 0.8rem; color: var(--muted); }
+input, select, textarea, button {
+  font: inherit;
+  padding: 0.55rem 0.65rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: #0f1724;
+  color: var(--text);
+}
+button, .btn {
+  cursor: pointer;
+  background: var(--accent);
+  border: none;
+  color: #fff;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-block;
+  padding: 0.55rem 1rem;
+  border-radius: 8px;
+}
+.btn.secondary { background: #334155; }
+table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin-top: 0.5rem; overflow-x: auto; display: block; }
+thead { display: table; width: 100%; table-layout: fixed; }
+tbody { display: table; width: 100%; table-layout: fixed; }
+th, td { text-align: left; padding: 0.45rem 0.35rem; border-bottom: 1px solid rgba(255,255,255,0.08); }
+th { color: var(--muted); font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.03em; }
+.banner {
+  max-width: 960px;
+  margin: 0 auto 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius);
+}
+.banner.error { background: rgba(255,107,107,0.15); border: 1px solid var(--danger); color: #ffc9c9; }
